@@ -13,6 +13,20 @@ class PageStatus extends StatefulWidget {
 }
 
 class _PageStatusState extends State<PageStatus> {
+  bool _status = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    if (widget.status == "Atrasado") {
+      _status == true;
+    } else {
+      _status = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,16 +35,41 @@ class _PageStatusState extends State<PageStatus> {
       ),
       body: Column(
         children: [
-          Text(widget.nome!),
+          Padding(
+            padding: const EdgeInsets.only(top: 30, bottom: 15),
+            child: Text(widget.nome!, textAlign: TextAlign.center),
+          ),
           Row(
             children: [
               Column(
                 children: [
-                  Text(widget.valor!),
-                  Text(widget.vencimento!),
+                  Container(
+                      width: MediaQuery.of(context).size.width / 2,
+                      height: 40,
+                      color: Colors.red,
+                      child: Center(child: Text(widget.valor!))),
+                  Container(
+                      width: MediaQuery.of(context).size.width / 2,
+                      height: 40,
+                      color: Colors.blue,
+                      child: Center(child: Text(widget.vencimento!))),
                 ],
               ),
-              Text(widget.status!),
+              Container(
+                  width: MediaQuery.of(context).size.width / 2,
+                  height: 80,
+                  color: Colors.amber,
+                  child: Center(
+                      child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _status = !_status;
+                              Navigator.pop(context, _status);
+                            });
+                          },
+                          icon: _status
+                              ? const Icon(Icons.add_call)
+                              : const Icon(Icons.accessible)))),
             ],
           )
         ],

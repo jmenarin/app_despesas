@@ -32,6 +32,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<int> names = [];
+  bool data = true;
+  Color _color = Colors.red;
 
   Map<String, Map<String, String>> contas = {
     "Internet": {
@@ -86,8 +88,8 @@ class _HomePageState extends State<HomePage> {
                     itemCount: contas.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          data = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (BuildContext context) => PageStatus(
@@ -95,14 +97,35 @@ class _HomePageState extends State<HomePage> {
                                       contas.values
                                           .elementAt(index)["Valor"]
                                           .toString(),
-                                          contas.values
+                                      contas.values
                                           .elementAt(index)["Vencimento"]
-                                          .toString(),contas.values
+                                          .toString(),
+                                      contas.values
                                           .elementAt(index)["Status"]
                                           .toString())));
+
+                          print(data);
+                          setState(() {
+                            if (data == true) {
+                              contas.addAll({
+                                contas.keys.elementAt(index): {
+                                  "Vencimento": "Pago"
+                                }
+                              });
+                            } else {
+                              contas.addAll({
+                                contas.keys.elementAt(index): {
+                                  "Vencimento": "Atrasado"
+                                }
+                              });
+                            }
+                          });
                         },
-                        child:
-                            ListTile(title: Text(contas.keys.elementAt(index))),
+                        child: Container(
+                          color: data ? Colors.red : Colors.green,
+                          child: ListTile(
+                              title: Text(contas.keys.elementAt(index))),
+                        ),
                       );
                     })),
             Expanded(
