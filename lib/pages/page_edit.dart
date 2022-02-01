@@ -4,8 +4,8 @@ class PageStatus extends StatefulWidget {
   String? nome;
   String? valor;
   String? vencimento;
-  String? status;
-  PageStatus(this.nome, this.valor, this.vencimento, this.status, {Key? key})
+  String? pagamento;
+  PageStatus(this.nome, this.valor, this.vencimento, this.pagamento, {Key? key})
       : super(key: key);
 
   @override
@@ -13,17 +13,24 @@ class PageStatus extends StatefulWidget {
 }
 
 class _PageStatusState extends State<PageStatus> {
-  bool _status = true;
+  _verificarStatus() {
+    switch (widget.pagamento) {
+      case "Pago":
+        return widget.pagamento = "Atrasado";
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+      case "Em dia":
+        return widget.pagamento = "Pago";
 
-    if (widget.status == "Atrasado") {
-      _status == true;
+      case "Atrasado":
+        return widget.pagamento = "Pago";
+    }
+  }
+
+  atualizar() {
+    if (widget.pagamento == "Em dia" || widget.pagamento == "Atrasado") {
+      return const Icon(Icons.thumb_up_alt_outlined);
     } else {
-      _status = false;
+      return const Icon(Icons.thumb_down_alt_outlined);
     }
   }
 
@@ -63,13 +70,11 @@ class _PageStatusState extends State<PageStatus> {
                       child: IconButton(
                           onPressed: () {
                             setState(() {
-                              _status = !_status;
-                              Navigator.pop(context, _status);
+                              _verificarStatus();
                             });
+                            Navigator.pop(context, widget.pagamento);
                           },
-                          icon: _status
-                              ? const Icon(Icons.add_call)
-                              : const Icon(Icons.accessible)))),
+                          icon: atualizar()))),
             ],
           )
         ],

@@ -32,29 +32,37 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<int> names = [];
-  bool data = true;
-  Color _color = Colors.red;
+  String? data;
 
   Map<String, Map<String, String>> contas = {
     "Internet": {
       "Valor": "180",
       "Vencimento": "11/02/2022",
-      "Status": "Atrasado"
+      "Pagamento": "Pago"
     },
     "Energia": {
       "Valor": "480",
       "Vencimento": "11/02/2022",
-      "Status": "Atrasado"
+      "Pagamento": "Atrasado"
     },
-    "Cartão": {
-      "Valor": "480",
-      "Vencimento": "11/02/2022",
-      "Status": "Atrasado"
-    },
-    "Casa": {"Valor": "480", "Vencimento": "11/02/2022", "Status": "Atrasado"},
-    "Agua": {"Valor": "480", "Vencimento": "11/02/2022", "Status": "Atrasado"}
+    "Cartão": {"Valor": "480", "Vencimento": "11/02/2022", "Pagamento": "Pago"},
+    "Casa": {"Valor": "480", "Vencimento": "11/02/2022", "Pagamento": "Em dia"},
+    "Agua": {"Valor": "480", "Vencimento": "11/02/2022", "Pagamento": "Em dia"}
   };
   List<String> meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio"];
+
+ _verificarStatus(index) {
+    switch (contas.values.elementAt(index)["Pagamento"]) {
+      case "Pago":
+        return Colors.green;
+
+      case "Em dia":
+        return Colors.yellow;
+
+      case "Atrasado":
+        return Colors.red;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,37 +102,25 @@ class _HomePageState extends State<HomePage> {
                               MaterialPageRoute(
                                   builder: (BuildContext context) => PageStatus(
                                       contas.keys.elementAt(index),
+                                      contas.values.elementAt(index)["Valor"],
                                       contas.values
-                                          .elementAt(index)["Valor"]
-                                          .toString(),
+                                          .elementAt(index)["Vencimento"],
                                       contas.values
-                                          .elementAt(index)["Vencimento"]
-                                          .toString(),
-                                      contas.values
-                                          .elementAt(index)["Status"]
-                                          .toString())));
-
-                          print(data);
+                                          .elementAt(index)["Pagamento"])));
                           setState(() {
-                            if (data == true) {
-                              contas.addAll({
-                                contas.keys.elementAt(index): {
-                                  "Vencimento": "Pago"
-                                }
-                              });
-                            } else {
-                              contas.addAll({
-                                contas.keys.elementAt(index): {
-                                  "Vencimento": "Atrasado"
-                                }
-                              });
+                            contas[contas.keys.elementAt(index)]!["Pagamento"] =
+                                data.toString();
+                            if (data != null) {
+                              _verificarStatus(index);
                             }
                           });
                         },
                         child: Container(
-                          color: data ? Colors.red : Colors.green,
+                          color: _verificarStatus(index),
                           child: ListTile(
-                              title: Text(contas.keys.elementAt(index))),
+                              title: Text(contas.values
+                                  .elementAt(index)["Pagamento"]
+                                  .toString())),
                         ),
                       );
                     })),
