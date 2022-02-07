@@ -4,6 +4,7 @@ import 'package:despesas/pages/new_count.dart';
 import 'package:flutter/material.dart';
 import 'package:despesas/pages/page_edit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const NewCount(),
+      home: const HomePage(),
     );
   }
 }
@@ -40,24 +41,30 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? data;
+  num resultado = 0;
 
-  Map<String, Map<String, String>> contas = {
-    /*"Internet": {
+  Map<String, Map<String, dynamic>> contas = {
+    "Internet": {
       "Valor": "180",
-      "Vencimento": "11/02/2022",
+      "Vencimento": DateFormat("dd/MM/yyyy").format(DateTime.now()),
       "Pagamento": "Pago"
     },
     "Energia": {
-      "Valor": "480",
-      "Vencimento": "11/02/2022",
+      "Valor": "200",
+      "Vencimento": DateFormat("dd/MM/yyyy").format(DateTime.now()),
       "Pagamento": "Atrasado"
     },
-    "Cartão": {"Valor": "480", "Vencimento": "11/02/2022", "Pagamento": "Pago"},
-    "Casa": {"Valor": "480", "Vencimento": "11/02/2022", "Pagamento": "Em dia"},
-    "Agua": {"Valor": "480", "Vencimento": "11/02/2022", "Pagamento": "Em dia"}*/
+    "Cartão": {
+      "Valor": "15",
+      "Vencimento": DateFormat("dd/MM/yyyy").format(DateTime.now()),
+      "Pagamento": "Pago"
+    },
+    "Casa": {"Valor": "50", "Vencimento": "10/02/2022", "Pagamento": "Em dia"},
+    "Agua": {"Valor": "48", "Vencimento": "04/02/2022", "Pagamento": "Em dia"}
   };
-  int mes = DateTime.now().month;
-  int ano = DateTime.now().year;
+  int mes = 3;
+  int ano = 2020;
+  int dia = 20;
 
   _verificarStatus(index) {
     switch (contas.values.elementAt(index)["Pagamento"]) {
@@ -130,18 +137,31 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  dinheiro() {
+    resultado = 0;
+    for (int ver = 0; ver < contas.keys.length; ver++) {
+      resultado = resultado + num.parse(contas.values.elementAt(ver)["Valor"]);
+      print(contas.values.elementAt(ver)["Valor"]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    dinheiro();
     return Scaffold(
         appBar: AppBar(
           title: const Text("Lista de nomes"),
           actions: [
             IconButton(
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  Map<String, Map<String, String>> teste = await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (BuildContext context) => const NewCount()));
+
+                  setState(() {
+                    contas.addAll(teste);
+                  });
                 },
                 icon: const Icon(Icons.add))
           ],
@@ -193,18 +213,35 @@ class _HomePageState extends State<HomePage> {
                           setState(() {
                             contas[contas.keys.elementAt(index)]!["Pagamento"] =
                                 data.toString();
+
                             if (data != null) {
                               _verificarStatus(index);
                             }
                           });
                         },
                         child: Container(
-                          color: _verificarStatus(index),
-                          child: ListTile(
-                              title: Text(contas.values
-                                  .elementAt(index)["Pagamento"]
-                                  .toString())),
-                        ),
+                            color: _verificarStatus(index),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  children: [
+                                    Text(contas.keys
+                                        .elementAt(index)
+                                        .toString()),
+                                    Text(contas.values
+                                        .elementAt(index)["Vencimento"]
+                                        .toString()),
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Text(
+                                        "R\$ ${contas.values.elementAt(index)["Valor"]}"),
+                                  ],
+                                )
+                              ],
+                            )),
                       );
                     })),
             Expanded(
@@ -227,7 +264,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text("Saldo a Pagar"),
-                      Text(ano.toString()),
+                      Text("R\$ $resultado"),
                     ],
                   ),
                 ))
